@@ -6,6 +6,21 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+    <script type="text/x-handlebars" data-template-name="todos/index">
+      <ul id="todo-list">
+        {{#each controller itemController="todo"}}
+          <li {{bindAttr class="isCompleted:completed isEditing:editing"}}>
+            {{#if isEditing}}
+              {{view Todos.EditTodoView valueBinding="title"}}
+            {{else}}
+              {{view Ember.Checkbox checkedBinding="isCompleted" class="toggle"}}
+              <label {{action "editTodo" on="doubleClick"}}>{{title}}</label><button {{action removeTodo}} class="destroy"></button>
+            {{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </script>
+
     <script type="text/x-handlebars" data-template-name="todos">
     <section id="todoapp">
       <header id="header">
@@ -15,37 +30,32 @@
       </header>
 
         <section id="main">
-          <ul id="todo-list">
-            {{#each controller itemController="todo"}}
-              <li {{bindAttr class="isCompleted:completed"}}>
-                {{view Ember.Checkbox checkedBinding="isCompleted" class="toggle"}}
-                <label>{{title}}</label><button class="destroy"></button>
-              </li>
-            {{/each}}
-          </ul>
+          {{outlet}}
 
-          <input type="checkbox" id="toggle-all">
+          {{view Ember.Checkbox id="toggle-all" checkedBinding="completeAll"}}
         </section>
 
         <footer id="footer">
           <span id="todo-count">
-            <strong>2</strong> todos left
+            <strong>{{remaining}}</strong> {{inflection}} left
           </span>
           <ul id="filters">
             <li>
-              <a href="all" class="selected">All</a>
+              {{#linkTo todos.index activeClass="selected"}}All{{/linkTo}}
             </li>
             <li>
-              <a href="active">Active</a>
+              {{#linkTo todos.active activeClass="selected"}}Active{{/linkTo}}
             </li>
             <li>
-              <a href="completed">Completed</a>
+              {{#linkTo todos.completed activeClass="selected"}}Completed{{/linkTo}}
             </li>
           </ul>
 
-          <button id="clear-completed">
-            Clear completed (1)
-          </button>
+          {{#if hasCompleted}}
+            <button id="clear-completed" {{action "clearCompleted"}}>
+              Clear completed ({{completed}})
+            </button>
+          {{/if}}
         </footer>
     </section>
 
@@ -61,7 +71,8 @@
     <script src="js/libs/jquery.min.js"></script>
     <script src="js/libs/handlebars-1.0.0-rc.4.js"></script>
     <script src="js/libs/ember-1.0.0-rc.5.min.js"></script>
-    <script src="js/libs/ember-data-12.js"></script>
+    <script src="js/libs/ember-data-latest.js"></script>
+    <script src="js/libs/localstorage_adapter.js"></script>
 
     <script src="js/application.js"></script>
     <script src="js/router.js"></script>
@@ -69,5 +80,6 @@
     <script src="js/models/todo.js"></script>
     <script src="js/controllers/todos_controller.js"></script>
     <script src="js/controllers/todo_controller.js"></script>
+    <script src="js/views/edit_todo_view.js"></script>
   </body>
 </html>
